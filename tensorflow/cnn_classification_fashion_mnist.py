@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout
 from tensorflow.keras.models import Model
 
@@ -31,3 +32,29 @@ x = Dropout(0.2)(x)
 x = Dense(K, activation='softmax')(x)
 
 model = Model(i, x)
+
+# Compile and fit
+# Note: GPU will help a lot here
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=15)
+
+df_history = pd.DataFrame(history.history)
+for metric in ['loss', 'accuracy']:
+    df_history[metric, f'val_{metric}'].plot()
+    
+def plot_confusion_matrix(y, y_pred):
+    df_confusion_matrix = pd.DataFrame(sklearn.metrics.confusion_matrix(y, y_pred))
+    sns.set(font_scale=1.4) # for label size
+    sns.heatmap(df_confusion_matrix, annot=True, annot_kws={"size": 16}) # font size
+
+y_test_pred = model.predict(y_test)
+plot_confusion_matrix(y_test, y_test_pred)
+    
+def show_misclassified_example(y, y_pred):
+    y_misclassified = y[y != y_pred]
+    i = np.random.choice(y_misclassified)
+    plt.imshow(y_misclassified[i], cmap='gray')
+    
+show_misclassified_example(y_test, y_test_pred)
