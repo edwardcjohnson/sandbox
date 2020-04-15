@@ -32,8 +32,9 @@ df_test[X] = scaler.transform(df_test[X])
 model = tf.keras.models.Sequential([
   tf.keras.layers.Dense(1, input_shape=(len(X), )) 
 ])
-model.compile(optimizer=tf.keras.optimizers.SGD(0.001, 0.9), loss='mse')
-# model.compile(optimizer='adam', loss='mse')
+model.compile(
+    optimizer=tf.keras.optimizers.SGD(0.001, 0.9),
+    loss='mse')
 
 # learning rate scheduler
 def schedule(epoch, lr):
