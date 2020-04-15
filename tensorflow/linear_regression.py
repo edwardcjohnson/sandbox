@@ -43,4 +43,9 @@ def schedule(epoch, lr):
 scheduler = tf.keras.callbacks.LearningRateScheduler(schedule)
 
 # Train the model
-r = model.fit(df_train[X], df_train[y], epochs=200, callbacks=[scheduler]) # .reshape(-1, 1)
+history = model.fit(df_train[X], df_train[y], epochs=200, callbacks=[scheduler]) # .reshape(-1, 1)
+
+df_history = pd.DataFrame(history.history)
+for metric in ['loss', 'accuracy']:
+    df_history[metric, f'val_{metric}'].plot()
+
