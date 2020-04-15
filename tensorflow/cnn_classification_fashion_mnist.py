@@ -22,6 +22,7 @@ print(f"number of classes: {k}")
 
 # Build the model using the functional API
 i = Input(shape=x_train[0].shape)
+# double the num of feature maps with each conv layer:
 x = Conv2D(32, (3, 3), strides=2, activation='relu')(i)
 x = Conv2D(64, (3, 3), strides=2, activation='relu')(x)
 x = Conv2D(128, (3, 3), strides=2, activation='relu')(x)
