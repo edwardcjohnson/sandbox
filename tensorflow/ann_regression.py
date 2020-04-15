@@ -41,7 +41,7 @@ model = tf.keras.Sequential([
 opt = tf.keras.optimizers.Adam(0.01) # adam opt with custom learning rate
 model.compile(optimizer=opt, loss='mse')
 history = model.fit(
-    df_train[X], 
+    df_train[X],  # .to_numpy()
     df_train[y],
     validation_data=(df_test[X], df_test[y])
 )
