@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout
+from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout, GlobalMaxPooling2D, MaxPooling2D, BatchNormalization
 from tensorflow.keras.models import Model
 
 # read in the data
@@ -21,31 +21,76 @@ print(x_train.shape)
 k = len(set(y_train))
 print(f"number of classes: {k}")
 
-# Build the model using the functional API
+#******************************************
+#   Model (fit without data augmentation)
+#******************************************
 i = Input(shape=x_train[0].shape)
 # double the num of feature maps with each conv layer:
-x = Conv2D(32, (3, 3), strides=2, activation='relu')(i)
-x = Conv2D(64, (3, 3), strides=2, activation='relu')(x)
-x = Conv2D(128, (3, 3), strides=2, activation='relu')(x)
+# do NOT use strided conv bc normal conv+maxpool works better here. Ref: VGG network (multiple conv before pooling)
+# x = Conv2D(32, (3, 3), strides=2, activation='relu')(i)
+# x = Conv2D(64, (3, 3), strides=2, activation='relu')(x)
+# x = Conv2D(128, (3, 3), strides=2, activation='relu')(x)
+## conv group 1
+x = Conv2D(32, (3, 3), activation='relu', padding='same')(i) # need padding='same' to avoid shrinking image after each conv
+x = BatchNormalization()(x) # BatchNormalization acts as a regularizer since mu and sigma change w/ each batch
+x = Conv2D(32, (3, 3), activation='relu', padding='same')(x)
+x = BatchNormalization()(x)
+x = MaxPooling2D((2,2))(x)
+# x = Dropout(0.2)(x) # Dropout didn't help with this dataset, so leave out
+## conv group 2
+x = Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+x = BatchNormalization()(x)
+x = Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+x = BatchNormalization()(x)
+x = MaxPooling2D((2,2))(x)
+# x = Dropout(0.2)(x) # Dropout didn't help with this dataset, so leave out
+## conv group 3
+x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
+x = BatchNormalization()(x)
+x = Conv2D(128, (3, 3), activation='relu', padding='same')(x)
+x = BatchNormalization()(x)
+x = MaxPooling2D((2,2))(x)
+# x = Dropout(0.2)(x) # Dropout didn't help with this dataset, so leave out
+## Dense group
 x = Flatten()(x)
 x = Dropout(0.2)(x)
-x = Dense(512, activation='relu')(x)
+x = Dense(1024, activation='relu')(x)
 x = Dropout(0.2)(x)
-x = Dense(K, activation='softmax')(x)
+x = Dense(k, activation='softmax')(x)
 
 model = Model(i, x)
 
-# Compile and fit
+# Compile
 # Note: GPU will help a lot here
 model.compile(optimizer='adam',
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
-history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=15)
-
+# Fit
+history = model.fit(x_train, y_train, validation_data=(x_test, y_test), epochs=50)
 df_history = pd.DataFrame(history.history)
 for metric in ['loss', 'accuracy']:
     df_history[metric, f'val_{metric}'].plot()
+
     
+#******************************************
+#   Model (fit with data augmentation)
+#******************************************
+# Note: if you run this AFTER calling the previous model.fit(), it will CONTINUE training where it left off.
+# Usually that's what you want, but for experimentation we can re-compile the model to start from scratch.
+batch_size = 32
+data_generator = tf.keras.preprocessing.image.ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
+train_generator = data_generator.flow(x_train, y_train, batch_size)
+steps_per_epoch = x_train.shape[0] // batch_size
+
+history = model.fit(train_generator, validation_data=(x_test, y_test), steps_per_epoch=steps_per_epoch, epochs=50)
+df_history = pd.DataFrame(history.history)
+for metric in ['loss', 'accuracy']:
+    df_history[metric, f'val_{metric}'].plot()    
+  
+  
+  
+  
+  
 def plot_confusion_matrix(y, y_pred):
     df_confusion_matrix = pd.DataFrame(sklearn.metrics.confusion_matrix(y, y_pred))
     sns.set(font_scale=1.4) # for label size
@@ -60,3 +105,6 @@ def show_misclassified_example(y, y_pred):
     plt.imshow(y_misclassified[i], cmap='gray')
     
 show_misclassified_example(y_test, y_test_pred)
+
+
+model.summary() # show the model architecture
