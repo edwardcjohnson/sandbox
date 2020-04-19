@@ -3,7 +3,7 @@ import pandas as pd
 import sklearn
 import tensorflow as tf
 
-def create_dateframe(start, stop, n_samples):
+def create_dataframe(start, stop, n_samples):
     # intialise dataframe
     df = pd.DataFrame({'x':np.linspace(start, stop, n_samples)} )
     # create response
