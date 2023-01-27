@@ -1,0 +1,5 @@
+# By default, ignore everything
+*
+
+# Add exceptions for the dirs and/or files you actually want to include in the docker build context
+!*.py
