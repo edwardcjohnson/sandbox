@@ -40,3 +40,14 @@ pgcli -h localhost -p 5432 -u root ny_taxi
 
 ## List tables
 \dt
+
+# Google Cloud Setup (DE Zoomcamp 1.3.1)
+https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main/week_1_basics_n_setup/1_terraform_gcp
+## Install gcloud CLI for Ubuntu:
+https://cloud.google.com/sdk/docs/downloads-snap
+
+# Terraform
+terraform init
+terraform plan
+terraform apply
+terraform destroy
