@@ -2,11 +2,11 @@ import pandas as pd
 import sqlalchemy
 import time
 
-def main():
+def ingest_data(user, pw, host, port, db):
     start = time.time()
 
     engine= sqlalchemy.create_engine(
-            "postgresql://root:root@pg-database:5432/ny_taxi" #  "postgresql://root:root@localhost:5432/ny_taxi"
+            f"postgresql://{user}:{pw}@{host}:{port}/{db}" #  "postgresql://root:root@localhost:5432/ny_taxi"
             )   
     pd.read_csv(
         "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/green/green_tripdata_2019-01.csv.gz",
@@ -17,8 +17,14 @@ def main():
         ).to_sql("taxi_zone_lookup", con=engine, chunksize=10000, if_exists="replace") 
                                                                                             
     end = time.time()
-    print(f"Job finished and took {end - start} seconds to run")
+    print(f"Finished ingesting data into postgresql {host}:{port}/{db}.\n The job took {end - start} seconds to run")
 
 
 if __name__== '__main__':
-    main()
+    ingest_data(
+        user='root',
+        pw='root',
+        host='pg-database',
+        port='5432',
+        db='ny_taxi',
+    )
