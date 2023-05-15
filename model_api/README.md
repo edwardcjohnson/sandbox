@@ -8,6 +8,9 @@ The following will send a GET request to your endpoint and return the response.
 
 Send a POST request instead and include the required data in the request body.
 For example, if your endpoint requires a JSON payload containing the data to be predicted, you can use the following command to send a POST request with the required data:
+`curl -X POST "http://localhost:8000/predict" -H "accept: application/json" -H "Content-Type: application/json" -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'`
+
+Or using the `payload.json` file that is available:
 `curl -X POST -H "Content-Type: application/json" -d @payload.json http://localhost:8000/predict`
 
 This should return a prediction that resembles:
