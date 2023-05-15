@@ -1,7 +1,9 @@
 # Running the app
 To run the application, first train the model by running `python train_model.py`. This will save the trained model to a file named `model.txt`.
 
-Then, start the FastAPI app by running uvicorn predict:app --reload. This will start the app and listen for incoming requests at http://localhost:8000. You can test the API by sending a POST request to http://localhost:8000/predict with a JSON payload containing values for the feature1, feature2, and feature3 fields.
+Then, start the FastAPI app by running `uvicorn predict:app --reload`. 
+This will start the app and listen for incoming requests at `http://localhost:8000`. 
+You can test the API by sending a POST request to `http://localhost:8000/predict` with a JSON payload containing values for the `feature1`, `feature2`, and `feature3` fields.
 
 The following will send a GET request to your endpoint and return the response.
 `curl http://localhost:8000/predict`
