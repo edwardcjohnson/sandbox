@@ -1,10 +1,13 @@
 import pandas as pd
 import lightgbm as lgb
 from fastapi import FastAPI
+import os
 from pydantic import BaseModel
 
 # Load the trained model from disk
-model = lgb.Booster(model_file='model.txt')
+
+model_path = os.environ.get("MODEL_FILE_PATH")
+model = lgb.Booster(model_file=model_path)
 
 # Create a FastAPI app instance
 app = FastAPI()
