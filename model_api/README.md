@@ -7,7 +7,7 @@ To build the Dockerfile.prep, navigate to the directory containing the Dockerfil
 docker build -t prep_data-image -f Dockerfile.prep_data .
 ```
 This command builds a Docker image with the tag prep_data-image and uses the Dockerfile.prep file as the build context.
-This command mounts the current working directory to the /app/data directory in the container and writes the output file to the mounted directory. The output file should now be available in your local filesystem in the same directory where you ran the docker run command.
+This command mounts the current working directory to the `/app/data directory` in the container and writes the output file to the mounted directory. The output file should now be available in your local filesystem in the same directory where you ran the docker run command.
 ```
 docker run -v $(pwd)/data:/app/data prep_data-image python prep_data.py -n 1000 -r 0 1 0 1 0 1 -o /app/data/data.csv
 ```
@@ -30,7 +30,7 @@ docker run -e MODEL_NAME=model.txt -e DATASET_PATH=/data/data.csv -v $(pwd)/data
 This command mounts the data directory to `/data` in the container and mounts the models directory to `/app/models` in the container. It also runs the `train_model.py` script located at `/app/train_model.py` in the container and saves the model to `/app/models/model.txt`.
 
 # Running the prediction app
-Start the FastAPI app by running uvicorn predict:app --reload. This will start the app and listen for incoming requests at `http://localhost:8000`. You can test the API by sending a POST request to `http://localhost:8000/predict` with a JSON payload containing values for the `feature1`, `feature2`, and `feature3` fields.
+Start the FastAPI app by running `uvicorn predict:app --reload`. This will start the app and listen for incoming requests at `http://localhost:8000`. You can test the API by sending a POST request to `http://localhost:8000/predict` with a JSON payload containing values for the `feature1`, `feature2`, and `feature3` fields.
 
 The following will send a GET request to your endpoint and return the response:<br>
 `curl http://localhost:8000/predict`
@@ -69,6 +69,19 @@ Test the predict endpoint with:<br>
 ```
 curl -X POST "http://localhost:8080/predict" -H "accept: application/json" -H "Content-Type: application/json" -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'
 ```
+
+# Deploying the prediction app on Kubernetes
+## Installation
+Minikube start guide:<br>
+https://minikube.sigs.k8s.io/docs/start/
+
+We will need to push images into minikube like this:
+`minikube image load <image name>`
+For more details on images in minikube, reference: 
+https://minikube.sigs.k8s.io/docs/handbook/pushing/#2-push-images-using-cache-command
+
+
+
 
 
 # Scaling the app
