@@ -77,11 +77,19 @@ https://minikube.sigs.k8s.io/docs/start/
 
 We will need to push images into minikube like this:
 `minikube image load <image name>`
+If your image changes after your cached it, run:
+`minikube cache reload`
 For more details on images in minikube, reference: 
 https://minikube.sigs.k8s.io/docs/handbook/pushing/#2-push-images-using-cache-command
 
-
-
+Helpful commands:
+```
+kubectl get services
+minikube service <service name> # Get the service's info
+minikube service <service-name> --url # Get the service's URL
+kubectl delete service <service name>
+kubectl delete deployment <deployment name>
+```
 
 
 # Scaling the app
