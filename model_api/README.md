@@ -71,6 +71,9 @@ curl -X POST "http://localhost:8080/predict" -H "accept: application/json" -H "C
 ```
 
 # Deploying the prediction app on Kubernetes
+## Build images
+Follow the previous steps to ensure that the model object has been created, and the predict-image image has been built.
+
 ## Installation
 Minikube start guide:<br>
 https://minikube.sigs.k8s.io/docs/start/
@@ -83,12 +86,20 @@ For more details on images in minikube, reference:
 https://minikube.sigs.k8s.io/docs/handbook/pushing/#2-push-images-using-cache-command
 
 Helpful commands:
+Reference: https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 ```
 kubectl get services
 minikube service <service name> # Get the service's info
 minikube service <service-name> --url # Get the service's URL
 kubectl delete service <service name>
 kubectl delete deployment <deployment name>
+```
+
+## Running the app
+Apply the service and deployment manifests using the following commands:
+```
+kubectl apply -f kubernetes/service.yaml
+kubectl apply -f kubernetes/deployment.yaml
 ```
 
 
