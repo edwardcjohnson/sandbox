@@ -77,8 +77,9 @@ Follow the previous steps to ensure that the model object has been created, and 
 ## Installation
 Minikube start guide:<br>
 https://minikube.sigs.k8s.io/docs/start/
-
-We will need to push images into minikube like this:
+We will need to mount the model directory when we start minikube:<br>
+`minikube start --mount-string="$HOME/projects/sandbox_ecj/model_api/models:/models  --mount`
+We will need to push images into minikube like this:<br>
 `minikube image load <image name>`
 If your image changes after your cached it, run:
 `minikube cache reload`
@@ -99,6 +100,15 @@ kubectl delete deployment <deployment name>
 Apply the service and deployment manifests using the following commands:
 ```
 kubectl apply -f kubernetes/service.yaml
+kubectl apply -f kubernetes/deployment.yaml
+```
+
+## Troubleshooting deployment image helpful commands
+```
+kubectl delete deployment predict-deployment
+docker image rm predict-image
+docker build -t predict-image -f Dockerfile.predict . --no-cache
+minikube image load predict-image
 kubectl apply -f kubernetes/deployment.yaml
 ```
 
