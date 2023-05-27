@@ -103,6 +103,8 @@ kubectl apply -f kubernetes/service.yaml
 kubectl apply -f kubernetes/deployment.yaml
 ```
 
+`curl -X GET $(minikube ip):<port> -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'
+
 ## Troubleshooting deployment image helpful commands
 ```
 kubectl delete deployment predict-deployment
