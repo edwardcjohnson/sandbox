@@ -103,17 +103,22 @@ kubectl apply -f kubernetes/service.yaml
 kubectl apply -f kubernetes/deployment.yaml
 ```
 
-`curl -X GET $(minikube ip):<port> -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'
+```
+curl -X POST $(minikube ip):30001/predict -H "accept: application/json" -H "Content-Type: application/json" -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'
+```
 
 ## Troubleshooting deployment image helpful commands
 ```
-kubectl delete deployment predict-deployment
 docker image rm predict-image
 docker build -t predict-image -f Dockerfile.predict . --no-cache
 minikube image load predict-image
-kubectl apply -f kubernetes/deployment.yaml
-```
 
+kubectl delete deployment predict-deployment
+kubectl apply -f kubernetes/deployment.yaml
+
+kubectl delete deployment predict-service
+kubectl apply -f kubernetes/service.yaml
+```
 
 # Scaling the app
 Here are a few options to scale a FastAPI app, depending on your requirements and resources:
