@@ -78,7 +78,7 @@ Follow the previous steps to ensure that the model object has been created, and 
 Minikube start guide:<br>
 https://minikube.sigs.k8s.io/docs/start/
 We will need to mount the model directory when we start minikube:<br>
-`minikube start --mount-string="$HOME/projects/sandbox_ecj/model_api/models:/models  --mount`
+`minikube start --mount-string="$HOME/projects/sandbox_ecj/model_api/models:/models  --mount=True`
 We will need to push images into minikube like this:<br>
 `minikube image load <image name>`
 If your image changes after your cached it, run:
