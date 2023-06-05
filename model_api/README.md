@@ -52,13 +52,13 @@ Here is a brief explanation of each line:
 
 `FROM python:3.9`: This specifies the base image for the container.<br>
 `WORKDIR /app`: This sets the working directory to /app.<br>
-`COPY requirements.txt requirements.txt`: This copies the requirements.txt file from the host machine to the container.<br>
+`COPY requirements.txt .`: This copies the requirements.txt file from the host machine to the container.<br>
 `RUN pip3 install -r requirements.txt`: This installs the dependencies listed in requirements.txt.<br>
-`COPY . .`: This copies the current directory (which contains the predict.py file and the model.txt file) to the container.<br>
+`COPY predict.py .`: This copies the predict.py file into the image. Note the model.txt will be mounted so we don't have to rebuild the image everytime the model is updated.<br>
 `CMD ["uvicorn", "predict:app", "--host", "0.0.0.0", "--port", "80"]`: This specifies the command that should be run when the container starts. In this case, it starts the Uvicorn server that serves the FastAPI app on port 80.
 
 To build the Docker image with the tag `predict-image`, run the following command in the same directory as the Dockerfile:<br>
-`docker build -t predict-image -f Dockerfile.predict .`<br>
+`docker build -t predict-image -f Dockerfile.predict . --no-cache`<br>
 
 To start a container based on the `predict-image` image and map port `80` in the container to port `8080` on the host machine, use the following command:<br>
 `docker run -p 8080:80 -v $(pwd)/models:/models -e MODEL_FILE_PATH=/models/model.txt predict-image`
