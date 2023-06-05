@@ -78,7 +78,7 @@ Follow the previous steps to ensure that the model object has been created, and 
 Minikube start guide:<br>
 https://minikube.sigs.k8s.io/docs/start/
 We will need to mount the model directory when we start minikube:<br>
-`minikube start --mount-string="$HOME/projects/sandbox_ecj/model_api/models:/models  --mount=True`
+`minikube start --mount-string="$HOME/projects/sandbox/model_api/models:/models  --mount=True`
 We will need to push images into minikube like this:<br>
 `minikube image load <image name>`
 If your image changes after your cached it, run:
@@ -109,6 +109,12 @@ curl -X POST $(minikube ip):30001/predict -H "accept: application/json" -H "Cont
 
 ## Troubleshooting deployment image helpful commands
 ```
+minikube delete # delete the minikube container to modify the mount
+minikube start --mount-string="$HOME/projects/sandbox/model_api/models:/src"  --mount=True
+minikube ssh # connect to the minikube container to verify that the mount worked
+ls -alh /models
+
+# remove the image before editing and rebuilding
 docker image rm predict-image
 docker build -t predict-image -f Dockerfile.predict . --no-cache
 minikube image load predict-image
