@@ -7,7 +7,7 @@ To build the Dockerfile.prep, navigate to the directory containing the Dockerfil
 docker build -t prep_data-image -f Dockerfile.prep_data .
 ```
 This command builds a Docker image with the tag prep_data-image and uses the Dockerfile.prep file as the build context.
-This command mounts the current working directory to the /app/data directory in the container and writes the output file to the mounted directory. The output file should now be available in your local filesystem in the same directory where you ran the docker run command.
+This command mounts the current working directory to the `/app/data directory` in the container and writes the output file to the mounted directory. The output file should now be available in your local filesystem in the same directory where you ran the docker run command.
 ```
 docker run -v $(pwd)/data:/app/data prep_data-image python prep_data.py -n 1000 -r 0 1 0 1 0 1 -o /app/data/data.csv
 ```
@@ -30,7 +30,7 @@ docker run -e MODEL_NAME=model.txt -e DATASET_PATH=/data/data.csv -v $(pwd)/data
 This command mounts the data directory to `/data` in the container and mounts the models directory to `/app/models` in the container. It also runs the `train_model.py` script located at `/app/train_model.py` in the container and saves the model to `/app/models/model.txt`.
 
 # Running the prediction app
-Start the FastAPI app by running uvicorn predict:app --reload. This will start the app and listen for incoming requests at `http://localhost:8000`. You can test the API by sending a POST request to `http://localhost:8000/predict` with a JSON payload containing values for the `feature1`, `feature2`, and `feature3` fields.
+Start the FastAPI app by running `uvicorn predict:app --reload`. This will start the app and listen for incoming requests at `http://localhost:8000`. You can test the API by sending a POST request to `http://localhost:8000/predict` with a JSON payload containing values for the `feature1`, `feature2`, and `feature3` fields.
 
 The following will send a GET request to your endpoint and return the response:<br>
 `curl http://localhost:8000/predict`
@@ -52,13 +52,13 @@ Here is a brief explanation of each line:
 
 `FROM python:3.9`: This specifies the base image for the container.<br>
 `WORKDIR /app`: This sets the working directory to /app.<br>
-`COPY requirements.txt requirements.txt`: This copies the requirements.txt file from the host machine to the container.<br>
+`COPY requirements.txt .`: This copies the requirements.txt file from the host machine to the container.<br>
 `RUN pip3 install -r requirements.txt`: This installs the dependencies listed in requirements.txt.<br>
-`COPY . .`: This copies the current directory (which contains the predict.py file and the model.txt file) to the container.<br>
+`COPY predict.py .`: This copies the predict.py file into the image. Note the model.txt will be mounted so we don't have to rebuild the image everytime the model is updated.<br>
 `CMD ["uvicorn", "predict:app", "--host", "0.0.0.0", "--port", "80"]`: This specifies the command that should be run when the container starts. In this case, it starts the Uvicorn server that serves the FastAPI app on port 80.
 
 To build the Docker image with the tag `predict-image`, run the following command in the same directory as the Dockerfile:<br>
-`docker build -t predict-image -f Dockerfile.predict .`<br>
+`docker build -t predict-image -f Dockerfile.predict . --no-cache`<br>
 
 To start a container based on the `predict-image` image and map port `80` in the container to port `8080` on the host machine, use the following command:<br>
 `docker run -p 8080:80 -v $(pwd)/models:/models -e MODEL_FILE_PATH=/models/model.txt predict-image`
@@ -70,6 +70,61 @@ Test the predict endpoint with:<br>
 curl -X POST "http://localhost:8080/predict" -H "accept: application/json" -H "Content-Type: application/json" -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'
 ```
 
+# Deploying the prediction app on Kubernetes
+## Build images
+Follow the previous steps to ensure that the model object has been created, and the predict-image image has been built.
+
+## Installation
+Minikube start guide:<br>
+https://minikube.sigs.k8s.io/docs/start/
+We will need to mount the model directory when we start minikube:<br>
+`minikube start --mount-string="$HOME/projects/sandbox/model_api/models:/models  --mount=True`
+We will need to push images into minikube like this:<br>
+`minikube image load <image name>`
+If your image changes after your cached it, run:
+`minikube cache reload`
+For more details on images in minikube, reference: 
+https://minikube.sigs.k8s.io/docs/handbook/pushing/#2-push-images-using-cache-command
+
+Helpful commands:
+Reference: https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+```
+kubectl get services
+minikube service <service name> # Get the service's info
+minikube service <service-name> --url # Get the service's URL
+kubectl delete service <service name>
+kubectl delete deployment <deployment name>
+```
+
+## Running the app
+Apply the service and deployment manifests using the following commands:
+```
+kubectl apply -f kubernetes/service.yaml
+kubectl apply -f kubernetes/deployment.yaml
+```
+
+```
+curl -X POST $(minikube ip):30001/predict -H "accept: application/json" -H "Content-Type: application/json" -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'
+```
+
+## Troubleshooting deployment image helpful commands
+```
+minikube delete # delete the minikube container to modify the mount
+minikube start --mount-string="$HOME/projects/sandbox/model_api/models:/src"  --mount=True
+minikube ssh # connect to the minikube container to verify that the mount worked
+ls -alh /models
+
+# remove the image before editing and rebuilding
+docker image rm predict-image
+docker build -t predict-image -f Dockerfile.predict . --no-cache
+minikube image load predict-image
+
+kubectl delete deployment predict-deployment
+kubectl apply -f kubernetes/deployment.yaml
+
+kubectl delete deployment predict-service
+kubectl apply -f kubernetes/service.yaml
+```
 
 # Scaling the app
 Here are a few options to scale a FastAPI app, depending on your requirements and resources:

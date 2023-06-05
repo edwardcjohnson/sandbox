@@ -4,8 +4,13 @@ from fastapi import FastAPI
 import os
 from pydantic import BaseModel
 
-# Load the trained model from disk
 
+# helpful prints for debugging
+print(f'------\npwd:\n{os.getcwd()}')
+print(f'------\nList current dir:\n{os.listdir()}')
+print(f'------\nList /app/models dir:\n{os.listdir("/app/models")}')
+
+# Load the trained model from disk
 model_path = os.environ.get("MODEL_FILE_PATH")
 model = lgb.Booster(model_file=model_path)
 
@@ -41,7 +46,6 @@ async def predict(data: InputData):
 
     # Return the prediction as a dictionary
     return {'prediction': prediction}
-
 
 # Run the app
 if __name__ == '__main__':
