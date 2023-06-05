@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: predict-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: predict-app
+  template:
+    metadata:
+      labels:
+        app: predict-app
+    spec:
+      containers:
+        - name: predict-container
+          image: predict-image
+          imagePullPolicy: Never # Do NOT pull image from the network e.g. DockerHub. Use locally built image. Remember to do: minikube image load predict-image
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: "512Mi"
+            requests:
+              cpu: "0.2"
+              memory: "256Mi"
+          volumeMounts:
+            - name: models-volume
+              mountPath: /app/models
+          env:
+            - name: MODEL_FILE_PATH
+              value: "/app/models/model.txt"
+      volumes:
+        - name: models-volume
+          hostPath:
+            path: /models # path to /models inside the minikube container that was set during the minikube start e.g. minikube start --mount-string="$HOME/projects/sandbox/model_api/models:/models"  --mount=True
+            type: Directory
