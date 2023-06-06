@@ -8,7 +8,7 @@ from pydantic import BaseModel
 # helpful prints for debugging
 print(f'------\npwd:\n{os.getcwd()}')
 print(f'------\nList current dir:\n{os.listdir()}')
-print(f'------\nList /app/models dir:\n{os.listdir("/app/models")}')
+# print(f'------\nList /app/models dir:\n{os.listdir("/app/models")}') # this line will help for the K8s deployment, but otherwise will throw an error.
 
 # Load the trained model from disk
 model_path = os.environ.get("MODEL_FILE_PATH")
