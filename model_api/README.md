@@ -110,7 +110,7 @@ curl -X POST $(minikube ip):30001/predict -H "accept: application/json" -H "Cont
 ## Troubleshooting deployment image helpful commands
 ```
 minikube delete # delete the minikube container to modify the mount
-minikube start --mount-string="$HOME/projects/sandbox/model_api/models:/src"  --mount=True
+minikube start --mount-string="$HOME/projects/sandbox/model_api/models:/models"  --mount=True
 minikube ssh # connect to the minikube container to verify that the mount worked
 ls -alh /models
 
