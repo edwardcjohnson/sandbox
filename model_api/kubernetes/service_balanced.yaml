@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: predict-service-balanced
+spec:
+  selector:
+    app: predict-app
+  # node's port is set to 30001.
+  # Requests sent to the nodePort will be sent to the containers' specified targetPort which is set to 80.
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30001 # Minikube's default exposed port range: 30000-32767
+  type: LoadBalancer
