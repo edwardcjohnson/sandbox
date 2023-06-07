@@ -106,8 +106,29 @@ kubectl apply -f kubernetes/deployment.yaml
 ```
 curl -X POST $(minikube ip):30001/predict -H "accept: application/json" -H "Content-Type: application/json" -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'
 ```
+## Scaling with a Load Balancer
+To access a LoadBalancer deployment in minikube, use the `minikube tunnel` command. Reference: https://minikube.sigs.k8s.io/docs/handbook/accessing/#loadbalancer-access
+For example:
+In another window, start the tunnel to create a routable IP for the 'predict-service-balanced' deployment:
+```
+minikube tunnel
+```
+Start the service:
+```
+kubectl apply -f kubernetes/service_balanced.yaml
+```
+To find the routable IP, run this command and examine the `EXTERNAL-IP` column:
+```
+kubectl get service predict-service-balanced
+```
+The service is available at `<EXTERNAL-IP>:80`
 
-## Troubleshooting deployment image helpful commands
+So, to generate the prediction, you can run:
+```
+curl -X POST <EXTERNAL-IP>:80/predict -H "accept: application/json" -H "Content-Type: application/json" -d '{"feature1": 0.5, "feature2": 0.7, "feature3": 0.2}'
+```
+
+## Troubleshooting helpful commands
 ```
 minikube delete # delete the minikube container to modify the mount
 minikube start --mount-string="$HOME/projects/sandbox/model_api/models:/models"  --mount=True
@@ -126,15 +147,3 @@ kubectl delete deployment predict-service
 kubectl apply -f kubernetes/service.yaml
 ```
 
-# Scaling the app
-Here are a few options to scale a FastAPI app, depending on your requirements and resources:
-
-Use a reverse proxy/load balancer: You can use a reverse proxy such as Nginx or a load balancer such as HAProxy to distribute incoming requests across multiple instances of your FastAPI app running on different servers. This can help distribute the load and improve the availability of your app.
-
-Use a container orchestrator: You can use a container orchestrator such as Kubernetes or Docker Swarm to manage and scale your app. With a container orchestrator, you can define the number of replicas or instances of your app that should be running and the orchestrator will handle the deployment, scaling, and load balancing of your app.
-
-Use a cloud provider: Many cloud providers such as AWS, GCP, and Azure offer services for running and scaling containerized applications, such as ECS, EKS, GKE, and AKS. These services provide a managed environment for running your app and can scale automatically based on demand.
-
-Optimize the app: You can optimize your FastAPI app to handle more requests with the same resources. Some techniques include using asynchronous code, caching responses, and optimizing database queries.
-
-Keep in mind that scaling an app can be complex and requires careful planning and monitoring. You should also consider the cost, complexity, and performance tradeoffs of different scaling strategies.
