@@ -1,0 +1,14 @@
+chromadb
+langchain
+openai
+pandas
+pypdf
+pdf2image
+pdfminer.six
+pyodbc
+pytest-cov
+pytesseract
+tabulate
+tiktoken
+unstructured
+xlrd
